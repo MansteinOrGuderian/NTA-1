@@ -157,3 +157,124 @@ bool primality_Miller_Rabin_test(long long int number_to_test, long long int amo
     }
     return true;
 }
+
+
+long long int rho_pollard_factorization(long long int n_mod_number) {
+    //long long int n_mod_number;
+    //std::cout << "Enter the mod number n\n"; // number to factorize
+    //std::cin >> n_mod_number;
+    std::cout << "Enter the biggest degree of polynom\n";
+    int biggest_degree;
+    std::cin >> biggest_degree; //5
+    biggest_degree += 1;
+    std::cout << "Enter the coef of polymon f(x)\n";
+    int* coef_polynom_array = new int[biggest_degree]; // 6 places (a_n * x^n + ... + a_0 * x^0 )
+    for (int i = 0; i < biggest_degree; i++) {
+        int number_coef;
+        std::cin >> number_coef;
+        /*if (i == 0) {
+            coef_polynom_array[i] = 1;
+            continue;
+        }*/
+        coef_polynom_array[i] = number_coef;
+    }
+    std::cout << "Coef of polynom f(x) are\n";
+    for (int i = 0; i < biggest_degree; i++)
+        std::cout << coef_polynom_array[i] << ' ';
+    // std::cout << "\nEnter the beginning position x0\n";
+    long long int x_null = 2; // From task
+    std::cout << "Start position of x0 is: " << x_null;
+    //std::cin >> x_null;
+    long long int approximate_size_of_array_of_subsequence = 5000; //((long long int)sqrt(n_mod_number)) + 1;  // approximate decide to do so size
+    long long int* array_of_function_values = new long long int[approximate_size_of_array_of_subsequence];
+    array_of_function_values[0] = x_null;
+    for (int i = 1; i < approximate_size_of_array_of_subsequence; i++) {
+        long long int function_value = 0;
+        for (int current_coef = 0, current_degree = biggest_degree - 1; current_coef < biggest_degree; current_coef++, current_degree--) {
+            long long int temp_value = 0;
+            temp_value = clear_Barret(int_number_to_int_degree(array_of_function_values[i - 1], current_degree), n_mod_number, 10); // ((x_i) ^ j ) % n_mod
+            temp_value = clear_Barret(coef_polynom_array[current_coef] * temp_value, n_mod_number, 10); //  (a_j * value) % n_mod
+            function_value = clear_Barret(function_value + temp_value, n_mod_number, 10); // (a_n * x^n + ... a_0 * x^0) % n_mod
+        }
+        array_of_function_values[i] = function_value;
+    }
+    bool break_point = 0;
+    long long int one_of_multiplier = 0;
+    while (!break_point) { //ro-pollard with Floyd modification
+        for (long long int i = 2; i < approximate_size_of_array_of_subsequence; i += 2) { // pairs form (x_2k, x_k)
+            long long int temp_difference = array_of_function_values[i] - array_of_function_values[i / 2];
+            temp_difference = temp_difference > 0 ? temp_difference : (-1) * temp_difference;
+            temp_difference = greater_common_divisor(temp_difference, n_mod_number);
+            std::cout << " i = " << i << " j = " << i / 2 << '\n';
+            std::cout << "gcd( " << array_of_function_values[i] << " - " << array_of_function_values[i / 2] << " , " << n_mod_number << " ) = " << temp_difference << '\n';
+            if (temp_difference != 1) {
+                break_point = 1;
+                one_of_multiplier = temp_difference;
+                break;
+            }
+        }
+    }
+    return one_of_multiplier;
+}
+
+Pair_of_elements<long long int*, long long int> Sieve_of_Eratosthenes(long long int number_to_which_count_primes) {
+    if (number_to_which_count_primes < 1) {
+        Pair_of_elements<long long int*, long long int> Data(NULL, 0);
+        return Data; // There are no prime values
+    }
+    switch (number_to_which_count_primes)
+    {
+    case 2: {
+        long long int* array_of_primes = new long long int[1]{ 2 };
+        Pair_of_elements<long long int*, long long int> Data(array_of_primes, 1);
+        return Data;
+        break;
+    }
+    case 3: {
+        long long int* array_of_primes = new long long int[2]{ 2, 3 };
+        Pair_of_elements<long long int*, long long int> Data(array_of_primes, 2);
+        return Data;
+        break;
+    }
+    default:
+        long long int array_of_numbers_size = number_to_which_count_primes + 1;
+        long long int* array_number = new long long int[array_of_numbers_size] {};
+        bool* if_number_is_prime_array = new bool[array_of_numbers_size] {};
+        long long int amount_of_prime_numbers = array_of_numbers_size;
+        for (long long int i = 0; i < array_of_numbers_size; i++) {
+            array_number[i] = i;
+            if_number_is_prime_array[i] = 1;
+            //std::cout << array_number[i] << ' ';
+        }
+        if_number_is_prime_array[0] = 0; // 0 isn't prime
+        if_number_is_prime_array[1] = 0; // 1 isn't prime
+        for (long long int i = 0; i <= (int)sqrt(number_to_which_count_primes); i++) { // 2 3 4
+            if (if_number_is_prime_array[i]) // 0 0 1 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0(!)
+                for (long long j = i * i; j <= number_to_which_count_primes; j += i) {
+                    if (if_number_is_prime_array[j] == 0)
+                        continue;
+                    else {
+                        if_number_is_prime_array[j] = 0;
+                        amount_of_prime_numbers--;
+                    }
+                }
+            /*std::cout << '\n';
+            for (int k = 0; k < array_of_numbers_size; k++)
+                std::cout << if_number_is_prime_array[k] << ' ';*/
+        }
+        amount_of_prime_numbers -= 2; // minus two places, because 0 and 1 are not primes
+        long long int* array_of_primes = new long long int[amount_of_prime_numbers] {};
+        for (long long int i = 0, j = 0; i < array_of_numbers_size; i++) {
+            if (if_number_is_prime_array[i]) {
+                array_of_primes[j] = array_number[i];
+                j++;
+            }
+        }
+        //for (int i = 0; i < amount_of_prime_numbers; i++) {
+        //    std::cout << array_of_primes[i] << ' ';
+        //}
+        Pair_of_elements<long long int*, long long int> Data(array_of_primes, amount_of_prime_numbers);
+        return Data;
+        break;
+    }
+}

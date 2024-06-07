@@ -19,3 +19,18 @@ long long int legendre_symbol(long long int numerator_a, long long int denominat
 bool if_pseudo_prime_number_by_Euler(long long int odd_number_p, long long int base_number);
 bool primality_Solovay_Strassen_test(long long int number_to_test, long long int amount_of_iterations);
 bool primality_Miller_Rabin_test(long long int number_to_test, long long int amount_of_iterations);
+
+long long int rho_pollard_factorization(long long n_mod_number);
+
+template <typename First_type, typename Second_type>
+struct Pair_of_elements {
+    First_type variable_one;
+    Second_type variable_two;
+    Pair_of_elements() : variable_one{}, variable_two{} {}
+    Pair_of_elements(First_type object_first, Second_type object_second) : variable_one(object_first), variable_two(object_second) {}
+    friend std::ostream& operator<<(std::ostream& out, const Pair_of_elements& Object_Data) {
+        out << '\n' << Object_Data.variable_one << ' ' << Object_Data.variable_two << '\n';
+        return out;
+    }
+};
+
