@@ -278,3 +278,35 @@ Pair_of_elements<long long int*, long long int> Sieve_of_Eratosthenes(long long 
         break;
     }
 }
+
+long long int* return_number_as_array_of_its_digit(long long int number) {
+    long long int digits_in_number = return_countDigit_in_number(number);
+    long long int* number_as_array = new long long int[digits_in_number];
+    while (digits_in_number) {
+        int temp = number % 10; // decimal base scale
+        number_as_array[digits_in_number - 1] = temp;
+        number /= 10;
+        digits_in_number--;
+    }
+    return number_as_array;
+}
+
+long long int bruteforce_factorization(long long int n_mod_number) {
+    long long int base_scale = 10;
+    long long int digits_in_number = return_countDigit_in_number(n_mod_number);
+    long long int* number_as_array = return_number_as_array_of_its_digit(n_mod_number);
+    Pair_of_elements<long long int*, long long int> data_about_prime_numbers = Sieve_of_Eratosthenes(48); // as asked in task, less then 47
+    bool is_divisor = 0;
+    long long int one_of_multiplier = 0;
+    for (int index_of_current_prime_number = 0; index_of_current_prime_number < data_about_prime_numbers.variable_two; index_of_current_prime_number++) {
+        long long int remainder = 0;
+        long long int current_prime = data_about_prime_numbers.variable_one[index_of_current_prime_number];
+        for (int current_digit = digits_in_number - 1, current_degree = 0; current_digit >= 0; current_digit--, current_degree++) {
+            remainder = remainder + ((number_as_array[current_digit] * (int_number_to_int_degree(10, current_degree) % current_prime)) % current_prime);
+            remainder %= current_prime;
+        }
+        if (remainder == 0)
+            return current_prime;
+    }
+    return -1; // input number don't have any divisors less than 48
+}

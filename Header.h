@@ -34,3 +34,6 @@ struct Pair_of_elements {
     }
 };
 
+Pair_of_elements<long long int*, long long int> Sieve_of_Eratosthenes(long long int number_to_which_count_primes);
+long long int* return_number_as_array_of_its_digit(long long int number);
+long long int bruteforce_factorization(long long int n_mod_number);
