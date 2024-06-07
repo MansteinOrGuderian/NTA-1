@@ -106,7 +106,7 @@ long long int Barret_Gorner(long long int X_base_to_power, long long int n_mod_n
     return Y_answer;
 }
 
-bool primality_Solovay_Strassen_test(long long int number_to_test, long long int amount_of_tries) { // detect not prime numbers, with probapility 1 / 2 ^ amount_of_tries, for all prime numbers, exept 2, will return 0
+bool primality_Solovay_Strassen_test(long long int number_to_test, long long int amount_of_tries) { // detect not prime numbers, with probability 1 / 2 ^ amount_of_tries, for all prime numbers, exept 2, will return 0
     if (number_to_test == 2) 
         return true; // is prime
     if (number_to_test % 2 == 0 || number_to_test == 1)
@@ -123,3 +123,37 @@ bool primality_Solovay_Strassen_test(long long int number_to_test, long long int
     return true; 
 }
 
+bool primality_Miller_Rabin_test(long long int number_to_test, long long int amount_of_tries) { // detect not prime numbers, with probability 1 / 4 ^ amount_of_tries, for all prime numbers, exept 2, will return 0
+    if (number_to_test < 2)
+        return false;
+    if (number_to_test == 2)
+        return true; // is prime
+    if (number_to_test % 2 == 0)
+        return false; // isn't prime
+    long long int multiplier_d = number_to_test - 1;
+    long long int power_of_two = 0;
+    while (multiplier_d % 2 == 0) { // factoring number: (number_to_test - 1) == d * 2^n
+        power_of_two++;
+        multiplier_d /= 2;
+    }
+    long long int lower_bound = 2, upper_bound = number_to_test - 1;
+    for (int current_iteration = 0; current_iteration < amount_of_tries; current_iteration++) {
+        long long int randomly_generated_number = rand() % upper_bound + lower_bound;
+        if (greater_common_divisor(randomly_generated_number, number_to_test) > 1)
+            return false;
+        long long int number_x = Barret_Gorner(randomly_generated_number, number_to_test, 10, return_number_in_binary_numeral_system(multiplier_d));
+        if (number_x == 1 || number_x == (number_to_test - 1))
+            continue;
+        bool flag_to_continue = 0;
+        for (int current_degree = 0; current_degree < power_of_two - 1; current_degree++) {
+            number_x = Barret_Gorner(number_x, number_to_test, 10, return_number_in_binary_numeral_system(2));
+            if (number_x == number_to_test - 1) {
+                flag_to_continue = 1;
+                break;
+            }
+        }
+        if (!flag_to_continue)
+            return false;
+    }
+    return true;
+}

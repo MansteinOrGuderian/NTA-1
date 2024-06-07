@@ -7,5 +7,6 @@ int main() {
 	srand(time(0));
 	//for (int i = 0; i < 19; i++)
 	//	std::cout << (rand() % (200 - 7 + 1)) << " ";
-	std::cout << primality_Solovay_Strassen_test(323324583518541583, 79);
+	//std::cout << primality_Solovay_Strassen_test(323324583518541583, 79);
+	std::cout << primality_Miller_Rabin_test(19, 80);
 }

@@ -18,3 +18,4 @@ const char array_to_work_with_16_scale_notation[16] = { '0', '1', '2', '3', '4',
 long long int legendre_symbol(long long int numerator_a, long long int denominator_p);
 bool if_pseudo_prime_number_by_Euler(long long int odd_number_p, long long int base_number);
 bool primality_Solovay_Strassen_test(long long int number_to_test, long long int amount_of_iterations);
+bool primality_Miller_Rabin_test(long long int number_to_test, long long int amount_of_iterations);
