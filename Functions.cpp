@@ -27,6 +27,11 @@ long long int greater_common_divisor(long long int number_one, long long int num
 }
 
 std::vector<long long int> from_decimal_number_to_new_numeral_scale_of_notation(long long int old_decimal_number, long long int new_scale) {
+    if (old_decimal_number == 0) { // to work correctly
+        std::vector<long long int> array_where_number_in_new_scale_will_be_stored;
+        array_where_number_in_new_scale_will_be_stored.push_back(0);
+        return array_where_number_in_new_scale_will_be_stored;
+    }
     long long int number_output = 0;
     std::vector<long long int> array_where_number_in_new_scale_will_be_stored;
     while (old_decimal_number != 0) {
@@ -40,7 +45,7 @@ std::vector<long long int> from_decimal_number_to_new_numeral_scale_of_notation(
 
 std::vector<long long int> return_number_in_binary_numeral_system(unsigned long long int decimal_number) {
     std::vector<long long int> binary_record_of_number = from_decimal_number_to_new_numeral_scale_of_notation(decimal_number, 2);
-    for (int i = 0; i < binary_record_of_number.size(); i++)
+    for (long long int i = 0; i < binary_record_of_number.size(); i++)
         binary_record_of_number[i] -= '0';
     /*for (auto& place : binary_record_of_number) {
     place -= '0';
@@ -49,9 +54,28 @@ std::vector<long long int> return_number_in_binary_numeral_system(unsigned long 
     return binary_record_of_number;
 }
 
-long long int legendre_symbol(long long int numerator_a, long long int denominator_p) { // denominator_p should be prime, or will recieve wrong answer!
-    long long int legendre_symbol_value = Barret_Gorner(numerator_a, denominator_p, 10, return_number_in_binary_numeral_system( (denominator_p - 1) / 2) ); // Computing a ^ ((p - 1) / 2),  Euler's criterion a ^ ((p - 1) / 2) == 1 mod p 
-    return (legendre_symbol_value == (denominator_p - 1) ? -1 : legendre_symbol_value);
+long long int int_number_to_int_degree_with_mod(long long int number, long long int power, long long int modulo) {
+    if (power == 0)
+        return 1;
+    long long int original_number = number;
+    while (power > 1) {
+        number = ((number % modulo) * (original_number % modulo) % modulo);
+        power--;
+    }
+    return number;
+}
+
+long long int legendre_symbol(long long int numerator_a, long long int denominator_p) {  // denominator_p should be prime, or will recieve wrong answer!
+    if (denominator_p == 1)
+        return 1;
+    if (denominator_p % numerator_a == 0) // a == p * k
+        return 0;
+    long long int degree = (denominator_p - 1) / 2; // using Euler's criterion (a/p) == a ^ ((p - 1) / 2) mod p
+    long long int result_by_Euler_criterion = int_number_to_int_degree_with_mod(numerator_a, degree, denominator_p);// Barret_Gorner(numerator_a, denominator_p, 10, return_number_in_binary_numeral_system(degree));
+    if (result_by_Euler_criterion == 1) 
+        return 1;
+    else
+        return -1;
 }
 
 bool if_pseudo_prime_number_by_Euler(long long int odd_number_p, long long int base_number) { // if gcd(a, p) == 1 and (a/p) == a ^ ((p - 1) / 2) mod p
@@ -72,7 +96,7 @@ long long int return_countDigit_in_number(long long int number_to_found_digits) 
 long long int clear_Gorner(long long int X_base_to_power, std::vector<long long int> e_binary_power) {
     long long Y_answer = 1;
     //std::reverse(e.begin(), e.end());
-    for (int i = 0; i <= e_binary_power.size() - 1; i++) { //int i = e.size()-1; i >= 0; i--
+    for (long long int i = 0; i <= e_binary_power.size() - 1; i++) { //int i = e.size()-1; i >= 0; i--
         Y_answer = Y_answer * Y_answer;
         if (e_binary_power[i] == 1)
             Y_answer = Y_answer * X_base_to_power;
@@ -84,11 +108,11 @@ long long int clear_Barret(long long int x_number, long long int n_mod_number, l
     long long int k_digit_number = return_countDigit_in_number(n_mod_number);
     if (!n_mod_number)
         return -1;
-    long long int hard_division_niu = (int)pow(base_scale, k_digit_number) / (2 * n_mod_number);
+    long long int hard_division_niu = int_number_to_int_degree(base_scale, k_digit_number) / (2 * n_mod_number);
     long long int q1, q2, q3, result;
-    q1 = x_number / pow(base_scale, k_digit_number - 1);
+    q1 = (long long int)(x_number / int_number_to_int_degree(base_scale, k_digit_number - 1));
     q2 = q1 * hard_division_niu;
-    q3 = q2 / pow(base_scale, k_digit_number + 1);
+    q3 = (long long int)(q2 / int_number_to_int_degree(base_scale, k_digit_number + 1));
     result = x_number - q3 * n_mod_number;
     while (result >= n_mod_number)
         result -= n_mod_number;
@@ -98,7 +122,7 @@ long long int clear_Barret(long long int x_number, long long int n_mod_number, l
 long long int Barret_Gorner(long long int X_base_to_power, long long int n_mod_number, long long int base_scale, std::vector<long long int> e_binary_power) {
     long long Y_answer = 1;
     //std::reverse(e.begin(), e.end());
-    for (int i = 0; i <= e_binary_power.size() - 1; i++) { //int i = e.size()-1; i >= 0; i--
+    for (long long int i = 0; i <= e_binary_power.size() - 1; i++) { //int i = e.size()-1; i >= 0; i--
         Y_answer = clear_Barret(Y_answer * Y_answer, n_mod_number, base_scale);
         if (e_binary_power[i] == 1)
             Y_answer = clear_Barret(Y_answer * X_base_to_power, n_mod_number, base_scale);
@@ -295,13 +319,13 @@ long long int bruteforce_factorization(long long int n_mod_number) {
     long long int base_scale = 10;
     long long int digits_in_number = return_countDigit_in_number(n_mod_number);
     long long int* number_as_array = return_number_as_array_of_its_digit(n_mod_number);
-    Pair_of_elements<long long int*, long long int> data_about_prime_numbers = Sieve_of_Eratosthenes(48); // as asked in task, less then 47
+    Pair_of_elements<long long int*, long long int> data_about_prime_numbers = Sieve_of_Eratosthenes(100); // in task asked less then 47
     bool is_divisor = 0;
     long long int one_of_multiplier = 0;
-    for (int index_of_current_prime_number = 0; index_of_current_prime_number < data_about_prime_numbers.variable_two; index_of_current_prime_number++) {
-        long long int remainder = 0;
+    for (long long int index_of_current_prime_number = 0; index_of_current_prime_number < data_about_prime_numbers.variable_two; index_of_current_prime_number++) {
+        long long int remainder = 0; // using Pascal divisibility rule
         long long int current_prime = data_about_prime_numbers.variable_one[index_of_current_prime_number];
-        for (int current_digit = digits_in_number - 1, current_degree = 0; current_digit >= 0; current_digit--, current_degree++) {
+        for (long long int current_digit = digits_in_number - 1, current_degree = 0; current_digit >= 0; current_digit--, current_degree++) {
             remainder = remainder + ((number_as_array[current_digit] * (int_number_to_int_degree(10, current_degree) % current_prime)) % current_prime);
             remainder %= current_prime;
         }
@@ -309,4 +333,40 @@ long long int bruteforce_factorization(long long int n_mod_number) {
             return current_prime;
     }
     return -1; // input number don't have any divisors less than 48
+}
+
+long long int quadratic_sieve_algorithm(long long int number_to_factorise_n) {
+    long long int sieving_parameter_M = 50;
+    Pair_of_elements<long long int*, long long int> factor_base_data = formatting_factor_base(number_to_factorise_n);
+    long long int* factor_base_in_array = factor_base_data.variable_one;
+    long long int size_of_factor_base = factor_base_data.variable_two;
+    for (int i = 0; i < size_of_factor_base; i++) {
+        std::cout << factor_base_in_array[i] << ' ';
+    }
+
+    return -1;
+}
+
+Pair_of_elements<long long int*, long long int> formatting_factor_base(long long int number_n) {
+    long long int upper_bound_of_base = (long long int)(pow(exp(pow(log(number_n) * log(log(number_n)), 0.5)), (1 / sqrt(2)))); // (exp{ [ln(x) * ln(ln(x))] ^ 1/2} ) ^ \{alpha}, where \{alpha} = 1 / sqrt(2)
+    Pair_of_elements<long long int*, long long int> data_about_prime_numbers = Sieve_of_Eratosthenes(upper_bound_of_base); 
+    //long long int size_of_factor_base = 31; // (-1) + 30 primes, let's try so
+    //long long int* factor_base_in_array = new long long int[size_of_factor_base]; 
+    //factor_base_in_array[0] = -1; // -1 always need to be
+    //for (long long int factor_base_index = 1, data_prime_index = 0; (factor_base_index < size_of_factor_base) && (data_prime_index < data_about_prime_numbers.variable_two); data_prime_index++)
+    //    if (legendre_symbol(number_n, data_about_prime_numbers.variable_one[data_prime_index]) == 1) {
+    //        factor_base_in_array[factor_base_index] = data_about_prime_numbers.variable_one[data_prime_index];
+    //        factor_base_index++;
+    //    }
+    std::vector<long long int> factor_base_in_vector;
+    factor_base_in_vector.push_back(-1); // -1 always need to be
+    for (long long int data_prime_index = 0; data_prime_index < data_about_prime_numbers.variable_two; data_prime_index++)
+        if (legendre_symbol(number_n, data_about_prime_numbers.variable_one[data_prime_index]) == 1)
+            factor_base_in_vector.push_back(data_about_prime_numbers.variable_one[data_prime_index]);
+    long long int size_of_factor_base = factor_base_in_vector.size();
+    long long int* factor_base_in_array = new long long int[size_of_factor_base]; 
+    for (long long int current_index = 0; current_index < size_of_factor_base; current_index++)
+        factor_base_in_array[current_index] = factor_base_in_vector[current_index];
+    Pair_of_elements<long long int*, long long int> factor_base_data(factor_base_in_array, size_of_factor_base);
+    return factor_base_data;
 }
