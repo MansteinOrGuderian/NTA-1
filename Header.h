@@ -40,3 +40,4 @@ long long int bruteforce_factorization(long long int n_mod_number);
 long long int quadratic_sieve_algorithm(long long int number_to_factorise_n);
 Pair_of_elements<long long int*, long long int> formatting_factor_base(long long int number_n);
 long long int int_number_to_int_degree_with_mod(long long int number, long long int power, long long int modulo);
+long long int iterative_binary_search(long long int* array_of_numbers, long long int size_of_array, long long int number_to_search);

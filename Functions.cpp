@@ -182,32 +182,31 @@ bool primality_Miller_Rabin_test(long long int number_to_test, long long int amo
     return true;
 }
 
-
 long long int rho_pollard_factorization(long long int n_mod_number) {
     //long long int n_mod_number;
     //std::cout << "Enter the mod number n\n"; // number to factorize
     //std::cin >> n_mod_number;
-    std::cout << "Enter the biggest degree of polynom\n";
+    std::cout << "Enter the biggest degree of polynomial\n";
     int biggest_degree;
     std::cin >> biggest_degree; //5
     biggest_degree += 1;
     std::cout << "Enter the coef of polymon f(x)\n";
-    int* coef_polynom_array = new int[biggest_degree]; // 6 places (a_n * x^n + ... + a_0 * x^0 )
+    int* coef_polynomial_array = new int[biggest_degree]; // 6 places (a_n * x^n + ... + a_0 * x^0 )
     for (int i = 0; i < biggest_degree; i++) {
         int number_coef;
         std::cin >> number_coef;
         /*if (i == 0) {
-            coef_polynom_array[i] = 1;
+            coef_polynomial_array[i] = 1;
             continue;
         }*/
-        coef_polynom_array[i] = number_coef;
+        coef_polynomial_array[i] = number_coef;
     }
-    std::cout << "Coef of polynom f(x) are\n";
+    std::cout << "Coef of polynomial f(x) are\n";
     for (int i = 0; i < biggest_degree; i++)
-        std::cout << coef_polynom_array[i] << ' ';
+        std::cout << coef_polynomial_array[i] << ' ';
     // std::cout << "\nEnter the beginning position x0\n";
     long long int x_null = 2; // From task
-    std::cout << "Start position of x0 is: " << x_null;
+    std::cout << "\nStart position of x0 is: " << x_null;
     //std::cin >> x_null;
     long long int approximate_size_of_array_of_subsequence = 5000; //((long long int)sqrt(n_mod_number)) + 1;  // approximate decide to do so size
     long long int* array_of_function_values = new long long int[approximate_size_of_array_of_subsequence];
@@ -217,7 +216,7 @@ long long int rho_pollard_factorization(long long int n_mod_number) {
         for (int current_coef = 0, current_degree = biggest_degree - 1; current_coef < biggest_degree; current_coef++, current_degree--) {
             long long int temp_value = 0;
             temp_value = clear_Barret(int_number_to_int_degree(array_of_function_values[i - 1], current_degree), n_mod_number, 10); // ((x_i) ^ j ) % n_mod
-            temp_value = clear_Barret(coef_polynom_array[current_coef] * temp_value, n_mod_number, 10); //  (a_j * value) % n_mod
+            temp_value = clear_Barret(coef_polynomial_array[current_coef] * temp_value, n_mod_number, 10); //  (a_j * value) % n_mod
             function_value = clear_Barret(function_value + temp_value, n_mod_number, 10); // (a_n * x^n + ... a_0 * x^0) % n_mod
         }
         array_of_function_values[i] = function_value;
@@ -336,14 +335,60 @@ long long int bruteforce_factorization(long long int n_mod_number) {
 }
 
 long long int quadratic_sieve_algorithm(long long int number_to_factorise_n) {
-    long long int sieving_parameter_M = 50;
     Pair_of_elements<long long int*, long long int> factor_base_data = formatting_factor_base(number_to_factorise_n);
     long long int* factor_base_in_array = factor_base_data.variable_one;
     long long int size_of_factor_base = factor_base_data.variable_two;
-    for (int i = 0; i < size_of_factor_base; i++) {
-        std::cout << factor_base_in_array[i] << ' ';
+    //for (int i = 0; i < size_of_factor_base; i++) {
+    //    std::cout << factor_base_in_array[i] << ' ';
+    //}
+    long long int sieving_interval_parameter_M = 50;
+    long long int size_of_sieving_interval = 2 * sieving_interval_parameter_M + 1;
+    long long int* interval_as_array = new long long int[size_of_sieving_interval];
+    long long int* array_of_a = new long long int[size_of_sieving_interval];
+    long long int* array_of_b = new long long int[size_of_sieving_interval];
+    long long int* array_of_logarithms_b = new long long int[size_of_sieving_interval];
+    double* array_of_sum_of_logaritms = new double[size_of_sieving_interval] {0.0};
+    for (long long int current_index = 0; current_index < size_of_sieving_interval; current_index++) {
+        interval_as_array[current_index] = (-1) * sieving_interval_parameter_M + current_index;
+        array_of_a[current_index] = interval_as_array[current_index] + (long long int)sqrt(number_to_factorise_n);
+        array_of_b[current_index] = int_number_to_int_degree(array_of_a[current_index], 2) - number_to_factorise_n;
+        array_of_logarithms_b[current_index] = log((array_of_b[current_index] < 0) ? ((-1) * array_of_b[current_index]) : array_of_b[current_index]);
     }
 
+
+    for (long long int current_prime_index = 1; current_prime_index < size_of_factor_base; current_prime_index++) {
+        long long int current_modulo_p = factor_base_in_array[current_prime_index];
+        long long int first_term = (2 * (long long int)sqrt(number_to_factorise_n)) % current_modulo_p;// x^2 + 2 * (int)sqrt(n) * x + [(int)sqrt(n)]^2 = n mod p
+        long long int constant_term = int_number_to_int_degree_with_mod(number_to_factorise_n, 2, current_modulo_p);
+        long long int right_part = number_to_factorise_n % current_modulo_p;
+        right_part = ((right_part - constant_term) < 0) ? ((right_part - constant_term + current_modulo_p) % current_modulo_p) : ((right_part - constant_term) % current_modulo_p);
+        if (first_term == 0 && right_part == 0) {
+            long long int result_x = 0;
+            while (result_x <= sieving_interval_parameter_M) { // check at morning
+                long long int index_to_add_logarithm = iterative_binary_search(factor_base_in_array, size_of_factor_base, result_x);
+                //if (index_to_add_logarithm == -1) // can it exactly be??
+                //    continue; 
+                array_of_sum_of_logaritms[index_to_add_logarithm] += log(current_modulo_p);
+                result_x += current_modulo_p;
+            }
+            result_x = 0;
+            while (result_x >= (-1) * sieving_interval_parameter_M) {
+                long long int index_to_add_logarithm = iterative_binary_search(factor_base_in_array, size_of_factor_base, result_x);
+                array_of_sum_of_logaritms[index_to_add_logarithm] += log(current_modulo_p);
+                result_x += current_modulo_p;
+            }
+        }
+        else if (right_part == 0) { // x^2 + ax = 0 mod p -> x(x+a) = 0 mod p
+            long long int x1 = 0;
+            long long int x2 = (-1) * first_term;
+        }
+        else
+            continue; // is it appropriate, to skip variants x^2 = b mod p, x^2 + a * x + b = 0 mod p? 
+    }
+    //std::cout << "X" << "\t" << "a = X - sqrt(n)" << "\t" << "b = a^2 - n" "\t\t" << "ln(|b|)" << '\n';
+    //for (long long int current_index = 0; current_index < size_of_sieving_interval; current_index++) {
+    //    std::cout << interval_as_array[current_index] << "\t" << array_of_a[current_index] << "\t\t" << array_of_b[current_index] << "\t\t" << array_of_logarithms_b[current_index] << '\n';
+    //}
     return -1;
 }
 
@@ -369,4 +414,18 @@ Pair_of_elements<long long int*, long long int> formatting_factor_base(long long
         factor_base_in_array[current_index] = factor_base_in_vector[current_index];
     Pair_of_elements<long long int*, long long int> factor_base_data(factor_base_in_array, size_of_factor_base);
     return factor_base_data;
+}
+
+long long int iterative_binary_search(long long int* array_of_numbers, long long int size_of_array, long long int number_to_search) {
+    long long low_bound = 0, high_bound = size_of_array;
+    while (low_bound <= high_bound) {
+        long long int middle = low_bound + (high_bound - low_bound) / 2;
+        if (array_of_numbers[middle] == number_to_search)
+            return middle;
+        if (array_of_numbers[middle] < number_to_search)
+            low_bound = middle + 1;
+        else
+            high_bound = middle - 1;
+    }
+    return -1; // element is not in array
 }

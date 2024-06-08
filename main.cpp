@@ -21,7 +21,8 @@ int main() {
 	//number_to_factorise_n = 9893350372343;
 	//std::cout << "4-step: Quadratic sieve algorithm\n";
 	//std::cout << quadratic_sieve_algorithm(number_to_factorise_n) << '\n';
-	std::cout << quadratic_sieve_algorithm(9893350372343);
+	
+	//std::cout << quadratic_sieve_algorithm(9893350372343);
 
 }
 
