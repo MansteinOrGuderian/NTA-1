@@ -23,6 +23,10 @@ int main() {
 	//std::cout << quadratic_sieve_algorithm(number_to_factorise_n) << '\n';
 	
 	//std::cout << quadratic_sieve_algorithm(9893350372343);
+	/*int a = 5, b = a;
+	std::cout << a << ' ' << b;*/
 
+	std::set<int> a{8, 2, 4 , 1};
+	std::cout << *a.begin() << ' ' << (*a.begin() + 1);
 }
 

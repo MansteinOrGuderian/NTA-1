@@ -364,26 +364,74 @@ long long int quadratic_sieve_algorithm(long long int number_to_factorise_n) {
         right_part = ((right_part - constant_term) < 0) ? ((right_part - constant_term + current_modulo_p) % current_modulo_p) : ((right_part - constant_term) % current_modulo_p);
         if (first_term == 0 && right_part == 0) {
             long long int result_x = 0;
-            while (result_x <= sieving_interval_parameter_M) { // check at morning
-                long long int index_to_add_logarithm = iterative_binary_search(factor_base_in_array, size_of_factor_base, result_x);
-                //if (index_to_add_logarithm == -1) // can it exactly be??
+            bool* array_if_log_value_was_added = new bool[size_of_sieving_interval] {0};
+            while (result_x <= sieving_interval_parameter_M) { 
+                long long int index_to_add_logarithm = iterative_binary_search(interval_as_array, size_of_sieving_interval, result_x);
+                //if (index_to_add_logarithm == -1) // can it exactly be?? - No, contidition in "while" permit this
                 //    continue; 
                 array_of_sum_of_logaritms[index_to_add_logarithm] += log(current_modulo_p);
+                array_if_log_value_was_added[index_to_add_logarithm] = 1;
                 result_x += current_modulo_p;
             }
-            result_x = 0;
+            result_x = 0; // OR  result_x = -current_modulo_p
             while (result_x >= (-1) * sieving_interval_parameter_M) {
-                long long int index_to_add_logarithm = iterative_binary_search(factor_base_in_array, size_of_factor_base, result_x);
-                array_of_sum_of_logaritms[index_to_add_logarithm] += log(current_modulo_p);
-                result_x += current_modulo_p;
+                long long int index_to_add_logarithm = iterative_binary_search(interval_as_array, size_of_sieving_interval, result_x);
+                if (array_if_log_value_was_added[index_to_add_logarithm] == 0) { // we didn't need add twice to zero value 
+                    array_of_sum_of_logaritms[index_to_add_logarithm] += log(current_modulo_p);
+                    array_if_log_value_was_added[index_to_add_logarithm] = 1;
+                }
+                result_x -= current_modulo_p;
             }
         }
         else if (right_part == 0) { // x^2 + ax = 0 mod p -> x(x+a) = 0 mod p
-            long long int x1 = 0;
-            long long int x2 = (-1) * first_term;
+            bool* array_if_log_value_was_added = new bool[size_of_sieving_interval] {0};
+            long long int x1_result = 0;
+            long long int x2_result = (-1) * first_term, x2_temp = x2_result;
+            while (x1_result <= sieving_interval_parameter_M) {
+                long long int index_to_add_logarithm = iterative_binary_search(interval_as_array, size_of_sieving_interval, x1_result);
+                array_of_sum_of_logaritms[index_to_add_logarithm] += log(current_modulo_p);
+                array_if_log_value_was_added[index_to_add_logarithm] = 1;
+                x1_result += current_modulo_p;
+            }
+            x1_result = 0; // OR  result_x = -current_modulo_p
+            while (x1_result >= (-1) * sieving_interval_parameter_M) {
+                long long int index_to_add_logarithm = iterative_binary_search(interval_as_array, size_of_sieving_interval, x1_result);
+                if (array_if_log_value_was_added[index_to_add_logarithm] == 0) { // we didn't need add twice to zero value 
+                    array_of_sum_of_logaritms[index_to_add_logarithm] += log(current_modulo_p);
+                    array_if_log_value_was_added[index_to_add_logarithm] = 1;
+                }
+                x1_result -= current_modulo_p;
+            }
+            while (x2_result <= sieving_interval_parameter_M) {
+                long long int index_to_add_logarithm = iterative_binary_search(interval_as_array, size_of_sieving_interval, x2_result);
+                if (array_if_log_value_was_added[index_to_add_logarithm] == 0) { // we didn't need add twice log(p_i) to cell
+                    array_of_sum_of_logaritms[index_to_add_logarithm] += log(current_modulo_p);
+                    array_if_log_value_was_added[index_to_add_logarithm] = 1;
+                }
+                x2_result -= current_modulo_p;
+            }
+            x2_result = x2_temp;
+            while (x2_result >= (-1) * sieving_interval_parameter_M) {
+                long long int index_to_add_logarithm = iterative_binary_search(interval_as_array, size_of_sieving_interval, x2_result);
+                if (array_if_log_value_was_added[index_to_add_logarithm] == 0) { // we didn't need add twice log(p_i) to cell
+                    array_of_sum_of_logaritms[index_to_add_logarithm] += log(current_modulo_p);
+                    array_if_log_value_was_added[index_to_add_logarithm] = 1;
+                }
+                x2_result -= current_modulo_p;
+            }
+        }
+        else if (first_term == 0 && right_part != 0) { // x^2 = b mod p
+            if ( (current_modulo_p - 3) % 4 == 0) { // p = 4k + 3
+
+            }
+            else if ((current_modulo_p - 5) % 8 == 0) { // p = 8k + 5
+
+            }
+
+             
         }
         else
-            continue; // is it appropriate, to skip variants x^2 = b mod p, x^2 + a * x + b = 0 mod p? 
+            continue; // is it appropriate, to skip variant x^2 + a * x + b = 0 mod p? 
     }
     //std::cout << "X" << "\t" << "a = X - sqrt(n)" << "\t" << "b = a^2 - n" "\t\t" << "ln(|b|)" << '\n';
     //for (long long int current_index = 0; current_index < size_of_sieving_interval; current_index++) {
@@ -428,4 +476,94 @@ long long int iterative_binary_search(long long int* array_of_numbers, long long
             high_bound = middle - 1;
     }
     return -1; // element is not in array
+}
+
+bool is_number_prime(long long int number) {
+    if (number <= 1)
+        return false;
+    if (number == 2 || number == 3)
+        return true;
+    if (number % 2 == 0 || number % 3 == 0)
+        return false;
+    for (long long int i = 5; i <= sqrt(number); i = i + 6)
+        if (number % i == 0 || number % (i + 2) == 0)
+            return false;
+    return true;
+}
+
+Pair_of_elements<long long int*, long long int> all_quadratic_residues_in_array(long long int dimension_of_field_n_mod) {
+    long long int* elements_of_field = new long long int[dimension_of_field_n_mod - 1];
+    for (long long int i = 0; i < dimension_of_field_n_mod - 1; i++)
+        elements_of_field[i] = i + 1;
+    std::set<long long int> set_of_quadratic_residues;
+    if (is_number_prime(dimension_of_field_n_mod)) {
+        for (long long i = 0; i < (dimension_of_field_n_mod - 1) / 2; i++) // After a half, values will be repeat in reverse order
+            set_of_quadratic_residues.insert(clear_Barret(int_number_to_int_degree(elements_of_field[i], 2), dimension_of_field_n_mod, 10));
+    }
+    else { //not prime
+        if (dimension_of_field_n_mod % 2 == 0) { // even and not prime
+            for (long long i = 0; i < (dimension_of_field_n_mod - 1) / 2; i++) { // After a half, values will be repeat in reverse order
+                if (greater_common_divisor(elements_of_field[i], dimension_of_field_n_mod) == 1)
+                    set_of_quadratic_residues.insert(clear_Barret(int_number_to_int_degree(elements_of_field[i], 2), dimension_of_field_n_mod, 10));
+            }
+        }
+        else { // odd and not prime
+            for (long long i = 0; i < (dimension_of_field_n_mod - 1) / 2; i++) { // After a half, values will be repeat in reverse order
+                long long int to_insert = clear_Barret(int_number_to_int_degree(elements_of_field[i], 2), dimension_of_field_n_mod, 10);
+                if (greater_common_divisor(to_insert, dimension_of_field_n_mod) == 1)
+                    set_of_quadratic_residues.insert(to_insert);
+            }
+        }
+    }
+    long long int size_of_array_of_quadratic_residues = set_of_quadratic_residues.size();
+    long long int* array_of_quadratic_residues = new long long int[size_of_array_of_quadratic_residues];
+    
+    for (long long int index = 0; index < size_of_array_of_quadratic_residues; index++) // set(sorted) -> array
+        array_of_quadratic_residues[index] = (*set_of_quadratic_residues.begin() + index);
+    delete[] elements_of_field;
+    for (long long int i = 0; i < size_of_array_of_quadratic_residues; i++)
+        std::cout << array_of_quadratic_residues[i] << ' ';
+    std::cout << '\n';
+    Pair_of_elements<long long int*, long long int> Data(array_of_quadratic_residues, size_of_array_of_quadratic_residues);
+    return Data;
+}
+
+Pair_of_elements<long long int, long long int> squaring_root_per_modulo_p(long long int number_a, long long int prime_number_p) {
+        Pair_of_elements<long long int*, long long int> Data = all_quadratic_residues_in_array(prime_number_p);
+        long long int* quadratic_residues_in_array = Data.variable_one;
+        long long int quadratic_residues_in_array_size = Data.variable_two;
+        bool if_number_is_a_quadratic_residues = 0;
+        for (long long int i = 0; i < quadratic_residues_in_array_size; i++) {
+            if (quadratic_residues_in_array[i] == number_a) {
+                if_number_is_a_quadratic_residues = 1;
+                break;
+            }
+        }
+        if (if_number_is_a_quadratic_residues) {
+            if ((prime_number_p - 3) % 4 == 0) {
+                long long int k = (prime_number_p - 3) / 4;
+                long long int x = Barret_Gorner(number_a, prime_number_p, 10, return_number_in_binary_numeral_system((k + 1))); // x = +- a ^ (k + 1) mod p
+                while (x < 0) {
+                    x += prime_number_p;
+                    x = clear_Barret(x, prime_number_p, 10);
+                }
+                Pair_of_elements<long long int, long long int> result(x, -(x - prime_number_p));
+                return result;
+            }
+            else if ((prime_number_p - 5) % 8 == 0) {
+                long long int k = (prime_number_p - 5) / 8;
+                long long int x = Barret_Gorner(number_a, prime_number_p, 10, return_number_in_binary_numeral_system((k + 1))); 
+                x = (x * Barret_Gorner(2, prime_number_p, 10, return_number_in_binary_numeral_system((2 * k + 1)))) % prime_number_p; // x = +- a^(k + 1) * 2^(2k + 1)  mod p
+                Pair_of_elements<long long int, long long int> result(x, -(x - prime_number_p));
+                return result;
+            }
+            else if ((prime_number_p - 1) % 8 == 0) {
+                // AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa
+                return { 0,0 };
+            }
+        }
+        else {
+            std::cout << "\nError!\n" << number_a << " isn't quadratic residues to " << prime_number_p << '\n';
+            return { 0,0 };
+        }
 }

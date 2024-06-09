@@ -2,6 +2,7 @@
 #include <vector>
 #include <time.h>
 #include <cstdlib> 
+#include <set>
 
 long long int int_number_to_int_degree(long long int number, long long int power);
 
