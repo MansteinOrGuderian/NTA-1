@@ -26,7 +26,10 @@ int main() {
 	/*int a = 5, b = a;
 	std::cout << a << ' ' << b;*/
 
-	std::set<int> a{8, 2, 4 , 1};
-	std::cout << *a.begin() << ' ' << (*a.begin() + 1);
+
+	Pair_of_elements<long long int, long long int> result = squaring_root_per_prime_modulo_p(24, 47);
+	std::cout << result;
+	std::cout << '\n';
+
 }
 
