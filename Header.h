@@ -45,3 +45,6 @@ long long int iterative_binary_search(long long int* array_of_numbers, long long
 
 Pair_of_elements<long long int, long long int> squaring_root_per_prime_modulo_p(long long int number_a, long long int prime_number_p);
 Pair_of_elements <long long int, long long int> Tonelli_Shanks_algorithm(long long int number_a, long long int prime_number_p);
+
+//std::vector<long long int> vector_of_q_from_Euclidean_algorithm(long long int number_one, long long int number_two);
+//long long int reverse_element_using_Euclidean_algorithm(std::vector<long long int> given_vector_of_q, long long int number_to_reverse, long long int mod_number);
