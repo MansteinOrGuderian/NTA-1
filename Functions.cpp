@@ -338,10 +338,10 @@ long long int quadratic_sieve_algorithm(long long int number_to_factorise_n) {
     Pair_of_elements<long long int*, long long int> factor_base_data = formatting_factor_base(number_to_factorise_n);
     long long int* factor_base_in_array = factor_base_data.variable_one;
     long long int size_of_factor_base = factor_base_data.variable_two;
-   /* for (long long int index = 0; index < size_of_factor_base; index++)
+    for (long long int index = 0; index < size_of_factor_base; index++)
         std::cout << factor_base_in_array[index] << ' ';
-    std::cout << "\n\n\n";*/
-    long long int sieving_interval_parameter_M = 50;
+    std::cout << "\n\n\n";
+    long long int sieving_interval_parameter_M = 1000;
     long long int size_of_sieving_interval = 2 * sieving_interval_parameter_M + 1;
     long long int* interval_as_array = new long long int[size_of_sieving_interval];
     long long int* array_of_a = new long long int[size_of_sieving_interval];
@@ -592,22 +592,24 @@ long long int quadratic_sieve_algorithm(long long int number_to_factorise_n) {
     for (long long current_index = 1; current_index < size_of_sieving_interval; current_index++)
         if (array_of_differences[current_index] < bound_to_decide_if_can_be_B_number)
             bound_to_decide_if_can_be_B_number = array_of_differences[current_index];
-    bound_to_decide_if_can_be_B_number += 1; // setting bound value, if has potential to be B-number 
+    bound_to_decide_if_can_be_B_number += 2; // setting bound value, if has potential to be B-number 
 
     std::vector<long long int> candidates_to_B_numbers_vector;
-    bool* array_of_candidates_flag = new bool[sieving_interval_parameter_M] {0}; // SENCE ?
+    //bool* array_of_candidates_flag = new bool[sieving_interval_parameter_M] {0}; // SENCE ?
     for (long long int current_index = 0; current_index < size_of_sieving_interval; current_index++) {
-        if (array_of_differences[current_index] < bound_to_decide_if_can_be_B_number) {
+        if (array_of_differences[current_index] <= bound_to_decide_if_can_be_B_number) {
             candidates_to_B_numbers_vector.push_back(array_of_b[current_index]);
-            array_of_candidates_flag[current_index] = 1;
+            //array_of_candidates_flag[current_index] = 1;
         }
     }
     long long int amount_of_potential_B_numbers = candidates_to_B_numbers_vector.size();
-    long long int* candidates_to_B_numbers_array = new long long int[amount_of_potential_B_numbers];
-    for (long long int current_index = 0; current_index < amount_of_potential_B_numbers; current_index++)
-        candidates_to_B_numbers_vector[current_index] = candidates_to_B_numbers_vector[current_index]; // array of potential B-numbers 
+    long long int* candidates_to_B_numbers_array = new long long int[amount_of_potential_B_numbers] {0};
+    for (long long int current_index = 0; current_index < amount_of_potential_B_numbers; current_index++) {
+        candidates_to_B_numbers_array[current_index] = candidates_to_B_numbers_vector[current_index]; // array of potential B-numbers 
+        std::cout << candidates_to_B_numbers_array[current_index] << ' ';
+    } std::cout << '\n';
 
-    long long int amount_of_B_numbers = 1;
+    long long int amount_of_B_numbers = 1, amount_of_false_detected_B_numbers = 0;
     long long int* array_of_B_numbers = new long long int[amount_of_B_numbers];
     long long int** decomposition_of_B_numbers = new long long int* [amount_of_B_numbers];
     for (long long int index = 0; index < amount_of_B_numbers; index++) // amount of occurrences of each factor_base_number in decomposition
@@ -615,54 +617,79 @@ long long int quadratic_sieve_algorithm(long long int number_to_factorise_n) {
 
     for (long long int index_of_current_potential_B_number = 0; index_of_current_potential_B_number < amount_of_potential_B_numbers; index_of_current_potential_B_number++) {
         long long int current_candidate = candidates_to_B_numbers_array[index_of_current_potential_B_number];
-        //std::cout << "Decomposition of " << current_candidate << " on multipliers by factor base:\n";
-        for (long long int current_index_prime = 0; current_index_prime < size_of_factor_base; current_index_prime++) {
+        std::cout << "Decomposition of " << current_candidate << " on multipliers by factor base:\n";
+        if (current_candidate < 0) {
+            decomposition_of_B_numbers[index_of_current_potential_B_number][0]++;
+            current_candidate = (-1) * current_candidate;
+            std::cout << factor_base_in_array[0] << ' ';
+        }
+        for (long long int current_index_prime = 1; current_index_prime < size_of_factor_base; current_index_prime++) {
+            //std::cout << "Current factor " << factor_base_in_array[current_index_prime] << '\n';
             while (current_candidate % factor_base_in_array[current_index_prime] == 0) { // number could divide more than ones on current prime number
                 current_candidate = current_candidate / factor_base_in_array[current_index_prime];
-                //std::cout << factor_base_in_array[current_index_prime] << ' ';
+                std::cout << factor_base_in_array[current_index_prime] << ' ';
                 decomposition_of_B_numbers[index_of_current_potential_B_number][current_index_prime]++; // LATER ADD by mod 2
             }
         }
-        std::cout << "\n\n";
         if (current_candidate != 1) {
+            std::cout << current_candidate << '\n';
             std::cout << candidates_to_B_numbers_array[index_of_current_potential_B_number] << " isn't B-number\n\n";
-            //decomposition_of_B_numbers[index_of_current_potential_B_number] = new long long int[size_of_factor_base] {0}; 
-            for (long long int current_column = 0; current_column < size_of_factor_base; current_column++) // if number isn't B-number, reset line to 00..0 state
-                decomposition_of_B_numbers[index_of_current_potential_B_number][current_column] = 0;
-            continue;
+            for (long long int current_column = 0; current_column < size_of_factor_base; current_column++) // if number isn't B-number, reset line to default, 00..0 state
+                decomposition_of_B_numbers[index_of_current_potential_B_number][current_column] = -1; // better to use memset and store matrix in 1D array //  decomposition_of_B_numbers[index_of_current_potential_B_number] = new long long int[size_of_factor_base] {0}; 
+            amount_of_false_detected_B_numbers++;
         }
         else { // current_candidate decomposed by multipliers by factor base
             array_of_B_numbers[amount_of_B_numbers - 1] = candidates_to_B_numbers_array[index_of_current_potential_B_number]; // add to array of B-numbers
             std::cout << '\n' << candidates_to_B_numbers_array[index_of_current_potential_B_number] << " is B-number\n\n";
-            long long int new_size = amount_of_B_numbers + 1;
-            long long int** temp_decomposition = new long long int* [new_size]; // reshaping (add 1 row) !!
-            for (long long int row_index = 0; row_index < new_size; row_index++)
-                temp_decomposition[row_index] = new long long int[size_of_factor_base] {0};
-            for (long long int current_row = 0; current_row < new_size - 1; current_row++) // old data have one line less
-                for (long long int current_collumn = 0; current_collumn < size_of_factor_base; current_collumn++)
-                    temp_decomposition[current_row][current_collumn] = decomposition_of_B_numbers[current_row][current_collumn]; // copying old data
-            for (long long int row_index = 0; row_index < amount_of_B_numbers; row_index++) // old value of amount_of_B_numbers used
-                delete[] decomposition_of_B_numbers[row_index];
-            delete[] decomposition_of_B_numbers; // clear old memory
-            decomposition_of_B_numbers = temp_decomposition;
-            amount_of_B_numbers = new_size;
         }
+        long long int new_size = amount_of_B_numbers + 1;
+        long long int** temp_decomposition = new long long int* [new_size]; // reshaping (add 1 row) !!
+        for (long long int row_index = 0; row_index < new_size; row_index++)
+            temp_decomposition[row_index] = new long long int[size_of_factor_base] {0};
+        for (long long int current_row = 0; current_row < new_size - 1; current_row++) // old data have one line less
+            for (long long int current_collumn = 0; current_collumn < size_of_factor_base; current_collumn++)
+                temp_decomposition[current_row][current_collumn] = decomposition_of_B_numbers[current_row][current_collumn]; // copying old data
+        for (long long int row_index = 0; row_index < amount_of_B_numbers; row_index++) // old value of amount_of_B_numbers used
+            delete[] decomposition_of_B_numbers[row_index];
+        delete[] decomposition_of_B_numbers; // clear old memory
+        decomposition_of_B_numbers = temp_decomposition;
+        amount_of_B_numbers = new_size;
     }
-    long long int new_size = amount_of_B_numbers - 1;
-    long long int** temp_decomposition = new long long int* [new_size]; // reshaping (delete 1(last) row) !!
-    for (long long int row_index = 0; row_index < new_size; row_index++)
+    //long long int new_size = amount_of_B_numbers - 1;
+    //long long int** temp_decomposition = new long long int* [new_size]; // reshaping (delete 1(last) row) !!
+    //for (long long int row_index = 0; row_index < new_size; row_index++)
+    //    temp_decomposition[row_index] = new long long int[size_of_factor_base] {0};
+    //for (long long int current_row = 0; current_row < new_size; current_row++) // old data have last one line extra, which filled with no-significant zero values
+    //    for (long long int current_collumn = 0; current_collumn < size_of_factor_base; current_collumn++)
+    //        temp_decomposition[current_row][current_collumn] = decomposition_of_B_numbers[current_row][current_collumn]; // copying old data
+    //for (long long int row_index = 0; row_index < amount_of_B_numbers; row_index++) // old value of amount_of_B_numbers used
+    //    delete[] decomposition_of_B_numbers[row_index];
+    //delete[] decomposition_of_B_numbers; // clear old memory
+    //decomposition_of_B_numbers = temp_decomposition;
+    //amount_of_B_numbers = new_size;
+
+    std::cout << "\n\n";
+
+    long long int new_size = amount_of_B_numbers - amount_of_false_detected_B_numbers - 1; // reshaping - delete rows that contain not B-numbers and last row(extra row, which filled with no-significant zero values)
+    long long int** temp_decomposition = new long long int* [new_size];
+    for (long long int row_index = 0; row_index < new_size; row_index++) {
         temp_decomposition[row_index] = new long long int[size_of_factor_base] {0};
-    for (long long int current_row = 0; current_row < new_size; current_row++) // old data have last one line extra, which filled with no-significant zero values
+    }
+    for (long long int current_old_row_index = 0, current_new_row_index = 0; current_old_row_index < amount_of_B_numbers; current_old_row_index++) {
+        if (decomposition_of_B_numbers[current_old_row_index][0] == -1 || current_old_row_index == (amount_of_B_numbers - 1))
+            continue; // skip row where not B-numbers and the last one
         for (long long int current_collumn = 0; current_collumn < size_of_factor_base; current_collumn++)
-            temp_decomposition[current_row][current_collumn] = decomposition_of_B_numbers[current_row][current_collumn]; // copying old data
-    for (long long int row_index = 0; row_index < amount_of_B_numbers; row_index++) // old value of amount_of_B_numbers used
-        delete[] decomposition_of_B_numbers[row_index];
+            temp_decomposition[current_new_row_index][current_collumn] = decomposition_of_B_numbers[current_old_row_index][current_collumn]; // copying old data
+        current_new_row_index++;
+    }
+    for (long long int current_old_row_index = 0; current_old_row_index < amount_of_B_numbers; current_old_row_index++) // old value of amount_of_B_numbers used
+        delete[] decomposition_of_B_numbers[current_old_row_index];
     delete[] decomposition_of_B_numbers; // clear old memory
     decomposition_of_B_numbers = temp_decomposition;
     amount_of_B_numbers = new_size;
 
     for (long long int current_row = 0; current_row < amount_of_B_numbers; current_row++) {
-        //std::cout << "Decomposition of " << current_candidate << " on multipliers by factor base:\n"
+        //std::cout << "Decomposition of " << array_of_B_numbers[current_row] << " on multipliers by factor base:\n";
         for (long long int current_collumn = 0; current_collumn < size_of_factor_base; current_collumn++)
             std::cout << decomposition_of_B_numbers[current_row][current_collumn] << ' ';
         std::cout << '\n';

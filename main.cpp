@@ -14,6 +14,15 @@ bool is_number_prime(long long int number) {
 }
 
 
+void func(long long int** arr, long long int rows, long long int columns) {
+	long long int** my_arr = arr;
+	for (long long int row = 0; row < rows; row++) {
+		for (long long int column = 0; column < columns; column++)
+			std::cout << arr[row][column] << ' ';
+		std::cout << '\n';
+	}
+}
+
 int main() {
 	//long long int number_to_factorise_n = 323324583518541583; // 10001111100101011011111111011100011110001100001011100001111
 
@@ -66,26 +75,15 @@ int main() {
 	//	std::cout << '\n';
 	//}
 
-	long long int amount_of_B_numbers = 2, size_of_factor_base = 5;
+	long long int amount_of_B_numbers = 4, size_of_factor_base = 3;
 	long long int** decomposition_of_B_numbers = new long long int* [amount_of_B_numbers];
-	for (long long int index = 0; index < amount_of_B_numbers; index++)
+	for (long long int index = 0; index < amount_of_B_numbers; index++) 
 		decomposition_of_B_numbers[index] = new long long int[size_of_factor_base] {0};
-	for (long long int row = 0; row < amount_of_B_numbers; row++) {
-		for (long long int index = 0; index < size_of_factor_base; index++)
-			decomposition_of_B_numbers[row][index] = index;
-	}
-	for (long long int row = 0; row < amount_of_B_numbers; row++) {
-		if (row == 1) 
-			decomposition_of_B_numbers[row] = new long long int[size_of_factor_base] {0};
-		for (long long int index = 0; index < size_of_factor_base; index++) {
-			std::cout << decomposition_of_B_numbers[row][index] << ' ';
-		}
-		std::cout << '\n';
-	}
+	for (long long int row = 0; row < amount_of_B_numbers; row++)
+		for (long long int column = 0; column < size_of_factor_base; column++)
+			std::cin >> decomposition_of_B_numbers[row][column];
 
-	/*int arr[2][3];
-
-	*arr[1] = { 0 };*/
 	std::cout << "\n\n";
+	func(decomposition_of_B_numbers, amount_of_B_numbers, size_of_factor_base);
 }
 
