@@ -4,6 +4,7 @@
 #include <cstdlib> 
 #include <set>
 
+
 long long int int_number_to_int_degree(long long int number, long long int power);
 
 long long int greater_common_divisor(long long int number_one, long long int number_two);

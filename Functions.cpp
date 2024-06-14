@@ -335,19 +335,22 @@ long long int bruteforce_factorization(long long int n_mod_number) {
 }
 
 long long int quadratic_sieve_algorithm(long long int number_to_factorise_n) {
-    Pair_of_elements<long long int*, long long int> factor_base_data = formatting_factor_base(number_to_factorise_n);
+    /*Pair_of_elements<long long int*, long long int> factor_base_data = formatting_factor_base(number_to_factorise_n);
     long long int* factor_base_in_array = factor_base_data.variable_one;
-    long long int size_of_factor_base = factor_base_data.variable_two;
+    long long int size_of_factor_base = factor_base_data.variable_two;*/
+    long long int size_of_factor_base = 4;
+    long long int* factor_base_in_array = new long long int[size_of_factor_base] { -1, 2, 3, 5 };
     for (long long int index = 0; index < size_of_factor_base; index++)
         std::cout << factor_base_in_array[index] << ' ';
     std::cout << "\n\n\n";
-    long long int sieving_interval_parameter_M = 1000;
+   
+    long long int sieving_interval_parameter_M = 5; // 1000
     long long int size_of_sieving_interval = 2 * sieving_interval_parameter_M + 1;
     long long int* interval_as_array = new long long int[size_of_sieving_interval];
     long long int* array_of_a = new long long int[size_of_sieving_interval];
     long long int* array_of_b = new long long int[size_of_sieving_interval];
-    long long int* array_of_logarithms_b = new long long int[size_of_sieving_interval];
-    long long int* array_of_sum_of_logaritms = new long long int[size_of_sieving_interval] {0}; // With small numbers use instead long long int, double type (better without rounding) 
+    double* array_of_logarithms_b = new double[size_of_sieving_interval];
+    double* array_of_sum_of_logaritms = new double[size_of_sieving_interval] {0}; // With small numbers use instead long long int, double type (better without rounding) 
     for (long long int current_index = 0; current_index < size_of_sieving_interval; current_index++) {
         interval_as_array[current_index] = (-1) * sieving_interval_parameter_M + current_index;
         array_of_a[current_index] = interval_as_array[current_index] + (long long int)sqrt(number_to_factorise_n); // a = X + (int)sqrt(n)
@@ -580,7 +583,7 @@ long long int quadratic_sieve_algorithm(long long int number_to_factorise_n) {
                 continue; // are there any more cases...?
         }
     }
-    long long int* array_of_differences = new long long int[size_of_sieving_interval] {0};
+    double* array_of_differences = new double[size_of_sieving_interval] {0};
     std::cout << "X" << "\t" << "a = X - sqrt(n)" << "\t" << "b = a^2 - n" "\t\t" << "lg(|b|)" << "\t\t" << "sum(lg(p))"  << "\t\t" << "lg(|b|) - sum(lg(p))" << '\n';
     for (long long int current_index = 0; current_index < size_of_sieving_interval; current_index++) {
         array_of_differences[current_index] = array_of_logarithms_b[current_index] - array_of_sum_of_logaritms[current_index];
@@ -588,12 +591,13 @@ long long int quadratic_sieve_algorithm(long long int number_to_factorise_n) {
     }
     std::cout << "\n\n";
 
-    long long int bound_to_decide_if_can_be_B_number = array_of_differences[0]; // for small numbers can use only first
-    for (long long current_index = 1; current_index < size_of_sieving_interval; current_index++)
-        if (array_of_differences[current_index] < bound_to_decide_if_can_be_B_number)
-            bound_to_decide_if_can_be_B_number = array_of_differences[current_index];
-    bound_to_decide_if_can_be_B_number += 2; // setting bound value, if has potential to be B-number 
+    //long long int bound_to_decide_if_can_be_B_number = array_of_differences[0]; // for small numbers can use only first
+    //for (long long current_index = 1; current_index < size_of_sieving_interval; current_index++)
+    //    if (array_of_differences[current_index] < bound_to_decide_if_can_be_B_number)
+    //        bound_to_decide_if_can_be_B_number = array_of_differences[current_index];
+    //bound_to_decide_if_can_be_B_number += 2; // setting bound value, if has potential to be B-number 
 
+    double bound_to_decide_if_can_be_B_number = 1.0;
     std::vector<long long int> candidates_to_B_numbers_vector;
     //bool* array_of_candidates_flag = new bool[sieving_interval_parameter_M] {0}; // SENCE ?
     for (long long int current_index = 0; current_index < size_of_sieving_interval; current_index++) {
@@ -617,6 +621,7 @@ long long int quadratic_sieve_algorithm(long long int number_to_factorise_n) {
 
     for (long long int index_of_current_potential_B_number = 0; index_of_current_potential_B_number < amount_of_potential_B_numbers; index_of_current_potential_B_number++) {
         long long int current_candidate = candidates_to_B_numbers_array[index_of_current_potential_B_number];
+
         std::cout << "Decomposition of " << current_candidate << " on multipliers by factor base:\n";
         if (current_candidate < 0) {
             decomposition_of_B_numbers[index_of_current_potential_B_number][0]++;
@@ -628,14 +633,16 @@ long long int quadratic_sieve_algorithm(long long int number_to_factorise_n) {
             while (current_candidate % factor_base_in_array[current_index_prime] == 0) { // number could divide more than ones on current prime number
                 current_candidate = current_candidate / factor_base_in_array[current_index_prime];
                 std::cout << factor_base_in_array[current_index_prime] << ' ';
-                decomposition_of_B_numbers[index_of_current_potential_B_number][current_index_prime]++; // LATER ADD by mod 2
+                decomposition_of_B_numbers[index_of_current_potential_B_number][current_index_prime]++; 
+                decomposition_of_B_numbers[index_of_current_potential_B_number][current_index_prime] %= 2; // adding by mod 2
             }
         }
         if (current_candidate != 1) {
             std::cout << current_candidate << '\n';
             std::cout << candidates_to_B_numbers_array[index_of_current_potential_B_number] << " isn't B-number\n\n";
             for (long long int current_column = 0; current_column < size_of_factor_base; current_column++) // if number isn't B-number, reset line to default, 00..0 state
-                decomposition_of_B_numbers[index_of_current_potential_B_number][current_column] = -1; // better to use memset and store matrix in 1D array //  decomposition_of_B_numbers[index_of_current_potential_B_number] = new long long int[size_of_factor_base] {0}; 
+                decomposition_of_B_numbers[index_of_current_potential_B_number][current_column] = -1; // better to use memset and store matrix in 1D array 
+            array_of_B_numbers[amount_of_B_numbers - 1] = 0;
             amount_of_false_detected_B_numbers++;
         }
         else { // current_candidate decomposed by multipliers by factor base
@@ -688,6 +695,7 @@ long long int quadratic_sieve_algorithm(long long int number_to_factorise_n) {
     decomposition_of_B_numbers = temp_decomposition;
     amount_of_B_numbers = new_size;
 
+    std::cout << "Need to solve following system of equations by modulo 2:\n";
     for (long long int current_row = 0; current_row < amount_of_B_numbers; current_row++) {
         //std::cout << "Decomposition of " << array_of_B_numbers[current_row] << " on multipliers by factor base:\n";
         for (long long int current_collumn = 0; current_collumn < size_of_factor_base; current_collumn++)
@@ -695,6 +703,69 @@ long long int quadratic_sieve_algorithm(long long int number_to_factorise_n) {
         std::cout << '\n';
     }
 
+   char* marks_of_row = new char[amount_of_B_numbers] {0};
+   //bool flag
+   std::cout << "\n\n";
+   for (long long int current_column = 0; current_column < size_of_factor_base; current_column++) {
+       for (long long int current_row = 0; current_row < amount_of_B_numbers; current_row++) {
+           if (decomposition_of_B_numbers[current_row][current_column] == 1 && marks_of_row[current_row] != '*') {
+               marks_of_row[current_row] = '*'; // mark row
+               long long int index_of_column_to_right_side = current_column + 1, index_of_column_to_left_side = current_column - 1;
+               while (true) {
+                   if (index_of_column_to_right_side < size_of_factor_base) {
+                      // long long int if_number_in_selected_row_was_one = 0;
+                       for (long long int row = current_row; row < amount_of_B_numbers; row++) {
+                           for (long long int column = index_of_column_to_right_side; column < size_of_factor_base; column++) {
+                               //if (column == index_of_column_to_right_side)
+                                 //  if_number_in_selected_row_was_one = decomposition_of_B_numbers[current_row][column];
+                               if (decomposition_of_B_numbers[current_row][column] == 1) {
+                                   decomposition_of_B_numbers[row][column] ^= decomposition_of_B_numbers[row][current_column]; // XOR values in highlighted segment of matrix
+                               }
+                               //std::cout << decomposition_of_B_numbers[row][column] << ' ';
+                           }
+                           //std::cout << '\n';
+                       }
+                       index_of_column_to_right_side = size_of_factor_base;
+                   }
+                   if (index_of_column_to_left_side >= 0) {
+                       for (long long int row = current_row; row < amount_of_B_numbers; row++) {
+                           for (long long int column = index_of_column_to_left_side; column >= 0; column--) {
+                               if (decomposition_of_B_numbers[current_row][column] == 1) {
+                                   decomposition_of_B_numbers[row][column] ^= decomposition_of_B_numbers[row][current_column];
+                               }
+                              // std::cout << decomposition_of_B_numbers[row][column] << ' ';
+                           }
+                           //std::cout << '\n';
+                       }
+                       index_of_column_to_left_side = -1;
+                   }
+                   if (index_of_column_to_left_side < 0 && index_of_column_to_right_side == size_of_factor_base) // if run thought all matrix
+                       break;
+               }
+               break;
+           }
+          // std::cout << '\n';
+       }
+       //std::cout << "\n\n";
+   }
+
+   std::cout << "System of equations by modulo 2:\n";
+   for (long long int current_row = 0; current_row < amount_of_B_numbers; current_row++) {
+       //std::cout << "Decomposition of " << array_of_B_numbers[current_row] << " on multipliers by factor base:\n";
+       for (long long int current_collumn = 0; current_collumn < size_of_factor_base; current_collumn++)
+           std::cout << decomposition_of_B_numbers[current_row][current_collumn] << ' ';
+       std::cout << ' ' << marks_of_row[current_row] << '\n';
+   }
+
+   std::cout << "Factor base is:\n";
+   for (long long int index = 0; index < size_of_factor_base; index++)
+       std::cout << (index+1) << " number" << "\t\t" << factor_base_in_array[index] << '\n';
+   std::cout << "\n";
+
+   std::cout << "B-numbers is:\n";
+   for (long long int index = 0; index < amount_of_B_numbers; index++)
+       std::cout << (index + 1) << " number" << "\t\t" << array_of_B_numbers[index] << '\n';
+   std::cout << "\n";
     return -1;
 }
 
