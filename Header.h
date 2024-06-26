@@ -1,9 +1,9 @@
 #include <iostream>
 #include <vector>
-#include <time.h>
 #include <cstdlib> 
 #include <set>
-
+#include <functional>
+#include <chrono>
 
 long long int int_number_to_int_degree(long long int number, long long int power);
 
@@ -49,3 +49,5 @@ Pair_of_elements <long long int, long long int> Tonelli_Shanks_algorithm(long lo
 
 //std::vector<long long int> vector_of_q_from_Euclidean_algorithm(long long int number_one, long long int number_two);
 //long long int reverse_element_using_Euclidean_algorithm(std::vector<long long int> given_vector_of_q, long long int number_to_reverse, long long int mod_number);
+
+

@@ -1,6 +1,5 @@
 #include "Header.h"
 
-
 long long int int_number_to_int_degree(long long int number, long long int power) {
     if (power == 0)
         return 1;
@@ -185,32 +184,32 @@ bool primality_Miller_Rabin_test(long long int number_to_test, long long int amo
 }
 
 long long int rho_pollard_factorization(long long int n_mod_number) {
-    //long long int n_mod_number;
-    //std::cout << "Enter the mod number n\n"; // number to factorize
-    //std::cin >> n_mod_number;
-    std::cout << "Enter the biggest degree of polynomial\n";
+    //std::cout << "Enter the biggest degree of polynomial\n";
     int biggest_degree;
-    std::cin >> biggest_degree; //5
-    biggest_degree += 1;
-    std::cout << "Enter the coef of polymon f(x)\n";
-    int* coef_polynomial_array = new int[biggest_degree]; // 6 places (a_n * x^n + ... + a_0 * x^0 )
-    for (int i = 0; i < biggest_degree; i++) {
-        int number_coef;
-        std::cin >> number_coef;
-        /*if (i == 0) {
-            coef_polynomial_array[i] = 1;
-            continue;
-        }*/
-        coef_polynomial_array[i] = number_coef;
-    }
-    std::cout << "Coef of polynomial f(x) are\n";
+    //std::cin >> biggest_degree;
+    //biggest_degree += 1;
+    biggest_degree = 3;
+    //std::cout << "Enter the coef of polymon f(x)\n";
+    //int* coef_polynomial_array = new int[biggest_degree]; // (a_n * x^n + ... + a_0 * x^0 )
+    //for (int i = 0; i < biggest_degree; i++) {
+    //    int number_coef;
+    //    std::cin >> number_coef;
+    //    /*if (i == 0) {
+    //        coef_polynomial_array[i] = 1;
+    //        continue;
+    //    }*/
+    //    coef_polynomial_array[i] = number_coef;
+    //}
+    int* coef_polynomial_array = new int[biggest_degree] {1, 0, 1}; // 1* x^2 + 0 * x + 1
+    /*std::cout << "Coef of polynomial f(x) are\n";
     for (int i = 0; i < biggest_degree; i++)
-        std::cout << coef_polynomial_array[i] << ' ';
-    // std::cout << "\nEnter the beginning position x0\n";
+        std::cout << coef_polynomial_array[i] << ' ';*/
+
+    //std::cout << "\nEnter the beginning position x0\n";
     long long int x_null = 2; // From task
-    std::cout << "\nStart position of x0 is: " << x_null;
     //std::cin >> x_null;
-    long long int approximate_size_of_array_of_subsequence = 5000; //((long long int)sqrt(n_mod_number)) + 1;  // approximate decide to do so size
+    //std::cout << "\nStart position of x0 is: " << x_null;
+    long long int approximate_size_of_array_of_subsequence = 5000; // ((long long int)sqrt(n_mod_number)) + 1;  // approximate decide to do so size
     long long int* array_of_function_values = new long long int[approximate_size_of_array_of_subsequence];
     array_of_function_values[0] = x_null;
     for (int i = 1; i < approximate_size_of_array_of_subsequence; i++) {
@@ -230,8 +229,8 @@ long long int rho_pollard_factorization(long long int n_mod_number) {
             long long int temp_difference = array_of_function_values[i] - array_of_function_values[i / 2];
             temp_difference = temp_difference > 0 ? temp_difference : (-1) * temp_difference;
             temp_difference = greater_common_divisor(temp_difference, n_mod_number);
-            std::cout << " i = " << i << " j = " << i / 2 << '\n';
-            std::cout << "gcd( " << array_of_function_values[i] << " - " << array_of_function_values[i / 2] << " , " << n_mod_number << " ) = " << temp_difference << '\n';
+            // std::cout << " i = " << i << " j = " << i / 2 << '\n';
+            //std::cout << "gcd( " << array_of_function_values[i] << " - " << array_of_function_values[i / 2] << " , " << n_mod_number << " ) = " << temp_difference << '\n';
             if (temp_difference != 1) {
                 break_point = 1;
                 one_of_multiplier = temp_difference;
@@ -824,12 +823,12 @@ long long int quadratic_sieve_algorithm(long long int number_to_factorise_n) {
        delete[] decomposition_to_solve; // clear old memory
        decomposition_to_solve = decomposition_to_solve_temp;
 
-       std::cout << "\n\n";
-       for (long long int current_row = 0; current_row < amount_of_rows_that_can_use_as_possible_solution; current_row++) {
-           for (long long int current_column = 0; current_column < size_of_factor_base; current_column++)
-               std::cout << decomposition_to_solve[current_row][current_column] << ' ';
-           std::cout << '\t' << vector_of_numbers_of_lines_that_can_use_as_possible_solution[current_row] << " line\n";
-       }
+       //std::cout << "\n\n";
+       //for (long long int current_row = 0; current_row < amount_of_rows_that_can_use_as_possible_solution; current_row++) {
+       //    for (long long int current_column = 0; current_column < size_of_factor_base; current_column++)
+       //        std::cout << decomposition_to_solve[current_row][current_column] << ' ';
+       //    std::cout << '\t' << vector_of_numbers_of_lines_that_can_use_as_possible_solution[current_row] << " line\n";
+       //}
        
        for (long long int current_possible_solution = 0; current_possible_solution < amount_of_rows_that_can_use_as_possible_solution; current_possible_solution++) {
            long long int amount_of_ones_in_row = 0; 
@@ -866,7 +865,8 @@ long long int quadratic_sieve_algorithm(long long int number_to_factorise_n) {
                std::cout << first_multiplier << ' ' << second_multiplier << '\n';
                //Pair_of_elements <long long int, long long int> result(first_multiplier, second_multiplier);
                //return result;
-               //return (first_multiplier > second_multiplier ? first_multiplier : second_multiplier);
+               if (first_multiplier != 1 || second_multiplier != 1)
+                    return (first_multiplier > second_multiplier ? first_multiplier : second_multiplier);
            }
            else {
                std::vector<long long int> vectors_positions_of_terms_for_current_solution;
@@ -915,67 +915,24 @@ long long int quadratic_sieve_algorithm(long long int number_to_factorise_n) {
                    std::cout << "\nX = +- Y mod n, trivial solution. Try other possible solution.\n";
                    continue;
                }
+
                long long int first_multiplier = ((result_x - result_y < 0) ? (result_x - result_y + number_to_factorise_n) : (result_x - result_y));
                long long int second_multiplier = ((result_x + result_y > number_to_factorise_n) ? ((result_x + result_y) % number_to_factorise_n) : (result_x + result_y));
-                   
                first_multiplier = greater_common_divisor(first_multiplier, number_to_factorise_n);
                second_multiplier = greater_common_divisor(second_multiplier, number_to_factorise_n);
                std::cout << first_multiplier << ' ' << second_multiplier << '\n';
                //Pair_of_elements <long long int, long long int> result(first_multiplier, second_multiplier);
                //return result;
-               //return (first_multiplier > second_multiplier ? first_multiplier : second_multiplier);
+               if (first_multiplier != 1 || second_multiplier != 1)
+                   return (first_multiplier > second_multiplier ? first_multiplier : second_multiplier);
            }
-
-           /*for (long long int a : vectors_positions_of_terms_for_current_solution) {
-               for (long long int current_column = 0; current_column < size_of_factor_base; current_column++)
-                   std::cout << degree_decomposition_of_B_numbers[a][current_column] << ' ';
-               std::cout << '\t' << a << " line" << '\n';
-           }
-
-           unsigned long long int result_x = 1;
-           for (long long int index_of_used_row : vectors_positions_of_terms_for_current_solution) {
-               for (long long int factor_base_index = 0; factor_base_index < size_of_factor_base; factor_base_index++) {
-                   if (decomposition_of_B_numbers_with_mod[index_of_used_row][factor_base_index] == 1) {
-                       result_x *= array_of_a_of_B_numbers[index_of_used_row];
-                       result_x = result_x % number_to_factorise_n;
-                   }
-               }
-           }
-           std::cout << '\n' << "X: " << result_x;
-
-           unsigned long long int result_y = 1;
-           //for (long long int index_of_used_row : vectors_positions_of_terms_for_current_solution) {
-           //    for (long long int factor_base_index = 0; factor_base_index < size_of_factor_base; factor_base_index++) {
-           //        if (decomposition_of_B_numbers_with_mod[index_of_used_row][factor_base_index] == 1) {
-           //            result_y *= int_number_to_int_degree(factor_base_in_array[factor_base_index], degree_decomposition_of_B_numbers[index_of_used_row][factor_base_index]); //(unsigned long long int)abs(array_of_B_numbers[index_of_used_row]);
-           //            result_y %= number_to_factorise_n;
-           //        }
-           //    }
-           //}
-           for (long long int factor_base_index = 0; factor_base_index < size_of_factor_base; factor_base_index++) {
-               unsigned long long int degree = 0;
-               for (long long int index_of_used_row : vectors_positions_of_terms_for_current_solution)
-                   degree += degree_decomposition_of_B_numbers[index_of_used_row][factor_base_index];
-               result_y = (result_y * int_number_to_int_degree(factor_base_in_array[factor_base_index], degree / 2)) % number_to_factorise_n;
-           }
-           std::cout << '\n' << "Y: " << result_y;*/
-
-           /*std::cout << "\nB-numbers is:\n";
-           for (long long int index = 0; index < amount_of_B_numbers; index++)
-               std::cout << array_of_B_numbers[index] << "\t\t" << (index) << " number\n";
-           std::cout << "\n";*/
-          
-           //current_row_in_equation++;
        }
-       //std::cout << "\nFactor base is:\n";
-       //for (long long int index = 0; index < size_of_factor_base; index++)
-       //    std::cout << factor_base_in_array[index] << ' ';
-       //std::cout << "\n";
    }
    else { // amount_of_rows_that_can_use_as_possible_solution == 0
        std::cout << "There are no solutions exists\n";
        return -1;
    }
+   return -1;
 }
 
 Pair_of_elements<long long int*, long long int> formatting_factor_base(long long int number_n) {
@@ -1170,3 +1127,22 @@ Pair_of_elements <long long int, long long int> Tonelli_Shanks_algorithm(long lo
 //        return 0;
 //    }
 //}
+
+double MeasureTime(std::function<void()> operation, unsigned int amount_of_measurements) {
+    double* time_for_all_tryes = new double[amount_of_measurements + 1]{};
+    int current_measurement = 0;
+    while (current_measurement < amount_of_measurements) {
+        auto start_time = std::chrono::high_resolution_clock::now();
+        operation();  // Executing operation
+        auto end_time = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> elapsed_time = end_time - start_time;
+        time_for_all_tryes[current_measurement] = elapsed_time.count();
+        std::cout << time_for_all_tryes[current_measurement] << '\n';
+        time_for_all_tryes[amount_of_measurements] += time_for_all_tryes[current_measurement];
+        current_measurement++;
+        std::cout << "Total:\t" << time_for_all_tryes[amount_of_measurements] << '\n';
+    }
+    double average_time = (time_for_all_tryes[amount_of_measurements] / amount_of_measurements);
+    delete[] time_for_all_tryes;
+    return average_time;
+}
