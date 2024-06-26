@@ -794,7 +794,9 @@ long long int quadratic_sieve_algorithm(long long int number_to_factorise_n) {
        }
        if ((row_index == amount_of_B_numbers - 1) && amount_of_rows_that_can_use_as_possible_solution == 0) {
            std::cout << "Cannot solve system of equations\n";
-           throw std::exception("No solutions, make sieving interval bigger");
+           //throw std::exception("No solutions, make sieving interval bigger");
+           std::cout << "No solutions, make sieving interval bigger\n";
+           return -1;
        }
    }
 
